@@ -42,9 +42,10 @@
   .btn{border:0;border-radius:12px;padding:14px 0;font-size:15px;font-weight:800;min-height:48px;
     transition:transform .1s ease,opacity .1s ease}
   .btn-main{flex:1;background:var(--gold);color:#26200c}
-  .btn-g{flex:0 0 30%;background:#efece4;color:#1c1c22}
-  .btn-list{flex:0 0 26%;background:var(--dark);color:#fff}
+  .btn-g{flex:0 0 26%;background:#efece4;color:#1c1c22}
+  .btn-list{flex:0 0 24%;background:var(--dark);color:#fff}
   .btn:active{transform:scale(.96);opacity:.85}
+  .btn-theme{flex:0 0 48px;background:#efece4;color:#1c1c22;font-size:18px;padding:0}
   .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--dark);color:#fff;
     padding:11px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:70;opacity:0;transition:opacity .2s;pointer-events:none}
   .toast.show{opacity:1}
@@ -87,6 +88,7 @@
     .a-img{background:#33333b;color:#e8e6df}
     .a-del{background:#3a2523;color:#e07869}
     .empty{color:#9a9890}
+    .btn-theme{background:#33333b;color:#e8e6df}
   }
   :root[data-theme="dark"],
   :root[data-theme="dark"] body{background:#121216}
@@ -100,6 +102,7 @@
   :root[data-theme="dark"] .rec h4{color:#f0efe9}
   :root[data-theme="dark"] .rec .meta{color:#9a9890}
   :root[data-theme="dark"] .a-img{background:#33333b;color:#e8e6df}
+  :root[data-theme="dark"] .btn-theme{background:#33333b;color:#e8e6df}
   :root[data-theme="dark"] .a-del{background:#3a2523;color:#e07869}
   :root[data-theme="dark"] .empty{color:#9a9890}
   :root[data-theme="light"],
@@ -113,17 +116,13 @@
   :root[data-theme="light"] .rec h4{color:#1c1c22}
   :root[data-theme="light"] .rec .meta{color:#7c7a73}
   :root[data-theme="light"] .a-img{background:#efece4;color:#1c1c22}
+  :root[data-theme="light"] .btn-theme{background:#efece4;color:#1c1c22}
   :root[data-theme="light"] .a-del{background:#f7e4e1;color:var(--danger)}
   :root[data-theme="light"] .empty{color:#7c7a73}
-  #themeBtn{position:fixed;right:12px;z-index:41;top:calc(env(safe-area-inset-top) + 12px);
-    width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.12);
-    color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-  #themeBtn:active{background:rgba(255,255,255,.22)}
 </style>
 </head>
 <body>
 
-<button id="themeBtn" onclick="temaDegistir()" aria-label="Karanlık/Aydınlık mod">🌙</button>
 <header>
   <div class="brand">AYAZ <span>EMLAK</span></div>
   <div class="no">PORTFÖY NO<b id="pno">—</b></div>
@@ -138,6 +137,7 @@
 </div>
 
 <div class="bar">
+  <button class="btn btn-theme" id="themeBtn" onclick="temaDegistir()" aria-label="Karanlık/Aydınlık mod">🌙</button>
   <button class="btn btn-g" onclick="temizle(true)">Temizle</button>
   <button class="btn btn-list" onclick="kayitlarAc()">Kayıtlar <span id="cnt"></span></button>
   <button class="btn btn-main" id="saveBtn" onclick="kaydet()">KAYDET → Galeri</button>
