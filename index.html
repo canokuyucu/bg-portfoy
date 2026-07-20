@@ -27,22 +27,24 @@
     background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.4)}
   #frame img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none}
   .fld{position:absolute;border:0;background:rgba(200,161,74,.10);color:var(--pen);
-    font-weight:700;padding:0 4px;line-height:1;font-family:inherit;outline:none}
+    font-weight:700;padding:0 4px;line-height:1;font-family:inherit;outline:none;
+    transition:background .12s ease,box-shadow .12s ease}
   .fld:focus{background:rgba(200,161,74,.28);box-shadow:0 0 0 2px var(--gold)}
   textarea.fld{padding:6px;line-height:1.25;resize:none;font-weight:600}
   .cbx{position:absolute;display:flex;align-items:center;justify-content:center;
-    color:transparent;font-weight:900;cursor:pointer}
+    color:transparent;font-weight:900;cursor:pointer;transition:background .1s ease}
   .cbx.on{color:var(--pen)}
   .cbx:active{background:rgba(200,161,74,.25);border-radius:6px}
   /* Alt çubuk */
   .bar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;
     border-top:1px solid #e4e1d8;display:flex;gap:8px;
     padding:10px 12px calc(env(safe-area-inset-bottom) + 10px)}
-  .btn{border:0;border-radius:12px;padding:14px 0;font-size:15px;font-weight:800}
+  .btn{border:0;border-radius:12px;padding:14px 0;font-size:15px;font-weight:800;min-height:48px;
+    transition:transform .1s ease,opacity .1s ease}
   .btn-main{flex:1;background:var(--gold);color:#26200c}
   .btn-g{flex:0 0 30%;background:#efece4;color:#1c1c22}
   .btn-list{flex:0 0 26%;background:var(--dark);color:#fff}
-  .btn:active{transform:scale(.98)}
+  .btn:active{transform:scale(.96);opacity:.85}
   .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--dark);color:#fff;
     padding:11px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:70;opacity:0;transition:opacity .2s;pointer-events:none}
   .toast.show{opacity:1}
@@ -51,20 +53,41 @@
   .sheet{background:#f4f3ef;width:100%;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;
     padding:16px 14px calc(env(safe-area-inset-bottom) + 16px)}
   .sheet h3{margin:0 0 12px}
-  .listbar{display:flex;gap:8px;margin-bottom:12px}
-  .listbar button{flex:1;border:1px solid #e4e1d8;background:#fff;border-radius:10px;padding:10px 0;font-size:12px;font-weight:700}
+  .search{width:100%;border:1px solid #e4e1d8;background:#fff;border-radius:10px;padding:11px 12px;
+    font-size:14px;margin-bottom:10px;font-family:inherit;outline:none}
+  .search:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(200,161,74,.25)}
+  .listbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .listbar button{flex:1;min-width:88px;border:1px solid #e4e1d8;background:#fff;border-radius:10px;padding:10px 0;font-size:12px;font-weight:700}
   .rec{background:#fff;border:1px solid #e4e1d8;border-radius:12px;padding:12px;margin-bottom:10px}
   .rec .pno{font-size:11px;color:var(--gold-d);font-weight:800}
   .rec h4{margin:4px 0 2px;font-size:15px}
   .rec .meta{font-size:12px;color:#7c7a73;margin-bottom:10px}
   .rec .acts{display:flex;gap:6px;flex-wrap:wrap}
-  .rec .acts button{flex:1;min-width:64px;border:0;border-radius:9px;padding:9px 0;font-size:12px;font-weight:700}
+  .rec .acts button{flex:1;min-width:64px;min-height:40px;border:0;border-radius:9px;padding:9px 0;
+    font-size:12px;font-weight:700;transition:transform .1s ease,opacity .1s ease}
+  .rec .acts button:active{transform:scale(.95);opacity:.85}
   .a-open{background:var(--gold);color:#26200c}
   .a-img{background:#efece4;color:#1c1c22}
   .a-wa{background:#25d366;color:#fff}
   .a-del{background:#f7e4e1;color:var(--danger);flex:0 0 42px;min-width:42px}
   .close{width:100%;margin-top:8px;background:var(--dark);color:#fff;border:0;border-radius:12px;padding:13px;font-weight:800}
   .empty{text-align:center;color:#7c7a73;padding:40px 10px;font-size:13px}
+
+  @media (prefers-color-scheme: dark){
+    html,body{background:#121216}
+    .hint{background:#232329;color:#a9a7a0}
+    .sheet{background:#1c1c22}
+    .sheet h3{color:#f0efe9}
+    .search{background:#26262e;border-color:#38383f;color:#f0efe9}
+    .search::placeholder{color:#7c7a86}
+    .listbar button{background:#26262e;border-color:#38383f;color:#e8e6df}
+    .rec{background:#1f1f26;border-color:#33333b}
+    .rec h4{color:#f0efe9}
+    .rec .meta{color:#9a9890}
+    .a-img{background:#33333b;color:#e8e6df}
+    .a-del{background:#3a2523;color:#e07869}
+    .empty{color:#9a9890}
+  }
 </style>
 </head>
 <body>
@@ -85,7 +108,7 @@
 <div class="bar">
   <button class="btn btn-g" onclick="temizle(true)">Temizle</button>
   <button class="btn btn-list" onclick="kayitlarAc()">Kayıtlar <span id="cnt"></span></button>
-  <button class="btn btn-main" onclick="kaydet()">KAYDET → Galeri</button>
+  <button class="btn btn-main" id="saveBtn" onclick="kaydet()">KAYDET → Galeri</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -107,7 +130,7 @@ const OZELLIKLER = [
   "OKULA YAKIN","İPOTEK"];
 const COLX=[85,519,974];
 const ROWY=[1136,1190,1243,1297,1351,1405,1459,1512,1566,1620,1673,1727,1782];
-const CB_SIZE=60; // dokunma/işaret kutu boyu (native px)
+const CB_SIZE=72; // dokunma/işaret kutu boyu (native px) — 60'tan büyütüldü, dokunması daha kolay
 
 // özellik kutuları -> {label,cx,cy}
 const featCB = OZELLIKLER.map((lab,i)=>({label:lab, cx:COLX[Math.floor(i/13)], cy:ROWY[i%13]}));
@@ -192,6 +215,7 @@ document.getElementById("formImg").onload=olcekle;
 /* ---- Portföy no ---- */
 const SEQ_KEY="ayaz_sayac", DB_KEY="ayaz_portfoyler";
 let aktifNo;
+let duzenleIdx=null; // null=yeni kayıt, sayı=düzenlenen kaydın index'i
 function yeniNo(){const y=new Date().getFullYear();const s=JSON.parse(localStorage.getItem(SEQ_KEY)||"{}");
   return "AYAZ-P-"+y+"-"+String((s[y]||0)+1).padStart(4,"0");}
 function noOnayla(no){const y=no.split("-")[2],n=+no.split("-")[3];const s=JSON.parse(localStorage.getItem(SEQ_KEY)||"{}");
@@ -304,9 +328,13 @@ function rozet(){const n=tumKayitlar().length;document.getElementById("cnt").tex
 async function kaydet(){
   const v=topla();
   if(!v.mulk_sahibi && !v.adres && !v.telefon){toast("En az sahibi, adres veya telefon gir");return;}
-  const a=tumKayitlar(); a.unshift(v); dbYaz(a); noOnayla(v.portfoy_no);
+  const a=tumKayitlar();
+  const guncelleniyor = duzenleIdx!==null && a[duzenleIdx];
+  if(guncelleniyor){ a[duzenleIdx]=v; }
+  else { a.unshift(v); }
+  dbYaz(a); noOnayla(v.portfoy_no);
   galeriyeKaydet(v);
-  toast("✓ "+v.portfoy_no+" kaydedildi");
+  toast(guncelleniyor? "✓ "+v.portfoy_no+" güncellendi" : "✓ "+v.portfoy_no+" kaydedildi");
   temizle(false);
 }
 function bugun(){const d=new Date();return [String(d.getDate()).padStart(2,"0"),String(d.getMonth()+1).padStart(2,"0"),String(d.getFullYear())];}
@@ -318,14 +346,19 @@ function temizle(sor){
   Object.keys(checkState).forEach(k=>checkState[k]=false);
   document.querySelectorAll(".cbx.on").forEach(el=>el.classList.remove("on"));
   aktifNo=yeniNo(); noGoster();
+  duzenleModu(null);
   window.scrollTo({top:0,behavior:"smooth"});
+}
+function duzenleModu(idx){
+  duzenleIdx=idx;
+  const btn=document.getElementById("saveBtn");
+  btn.textContent = idx!==null ? "GÜNCELLE" : "KAYDET → Galeri";
 }
 
 /* ---- Kayıtlar paneli ---- */
 function esc(s){return(s||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));}
-function kayitlarAc(){
-  const a=tumKayitlar();
-  const body=a.length? a.map((v,i)=>`<div class="rec">
+function kayitSatiri(v,i){
+  return `<div class="rec">
       <div class="pno">${v.portfoy_no||""}</div>
       <h4>${esc(v.mahalle)||"—"} ${v.oda_sayisi?("· "+esc(v.oda_sayisi)):""} ${v.fiyat?("· "+esc(v.fiyat)+" ₺"):""}</h4>
       <div class="meta">${esc(v.mulk_sahibi)||"İsimsiz"} ${v.telefon?("· "+esc(v.telefon)):""}</div>
@@ -334,21 +367,43 @@ function kayitlarAc(){
         <button class="a-img" onclick="imgKayit(${i})">🖼 Görsel</button>
         <button class="a-wa" onclick="waKayit(${i})">WhatsApp</button>
         <button class="a-del" onclick="silKayit(${i})">🗑</button>
-      </div></div>`).join("") : '<div class="empty">Henüz kayıt yok.</div>';
+      </div></div>`;
+}
+function kayitEsle(v,q){
+  if(!q)return true;
+  const hay=[v.portfoy_no,v.mahalle,v.adres,v.mulk_sahibi,v.telefon,v.kiraci,v.kiraci_tel]
+    .map(x=>(x||"").toLocaleLowerCase("tr")).join(" ");
+  return hay.includes(q);
+}
+function kayitlarRenderla(q){
+  const a=tumKayitlar();
+  const listEl=document.getElementById("recList");
+  if(!listEl)return;
+  if(!a.length){listEl.innerHTML='<div class="empty">Henüz kayıt yok.</div>';return;}
+  const eslesen=a.map((v,i)=>({v,i})).filter(({v})=>kayitEsle(v,q));
+  listEl.innerHTML = eslesen.length
+    ? eslesen.map(({v,i})=>kayitSatiri(v,i)).join("")
+    : '<div class="empty">Aramayla eşleşen kayıt yok.</div>';
+}
+function kayitlarAc(){
   const html=`<div class="modal" onclick="if(event.target===this)this.remove()"><div class="sheet">
     <h3>Kayıtlar</h3>
+    <input id="recSearch" class="search" type="search" placeholder="Ara: isim, adres, mahalle, telefon, portföy no…" oninput="kayitlarRenderla(this.value.trim().toLocaleLowerCase('tr'))">
     <div class="listbar">
       <button onclick="disaAktar()">📤 Yedek Al</button>
+      <button onclick="disaAktarCsv()">📊 Excel'e Aktar</button>
       <button onclick="document.getElementById('imp').click()">📥 İçe Aktar</button>
       <input id="imp" type="file" accept="application/json" style="display:none" onchange="iceAktar(event)">
-    </div>${body}
+    </div>
+    <div id="recList"></div>
     <button class="close" onclick="this.closest('.modal').remove()">Kapat</button>
   </div></div>`;
   document.body.insertAdjacentHTML("beforeend",html);
+  kayitlarRenderla("");
 }
-function acKayit(i){yukle(tumKayitlar()[i]);document.querySelector(".modal")?.remove();toast("Forma yüklendi");}
+function acKayit(i){yukle(tumKayitlar()[i]);duzenleModu(i);document.querySelector(".modal")?.remove();toast("Forma yüklendi — GÜNCELLE ile üzerine yazılır");}
 function imgKayit(i){galeriyeKaydet(tumKayitlar()[i]);}
-function silKayit(i){if(!confirm("Bu kaydı sil?"))return;const a=tumKayitlar();a.splice(i,1);dbYaz(a);document.querySelector(".modal")?.remove();kayitlarAc();}
+function silKayit(i){if(!confirm("Bu kaydı sil?"))return;const a=tumKayitlar();a.splice(i,1);dbYaz(a);if(duzenleIdx!==null)duzenleModu(null);document.querySelector(".modal")?.remove();kayitlarAc();}
 function waMetni(v){
   const L=["🏠 *AYAZ EMLAK — PORTFÖY*",v.portfoy_no,""];
   if(v.mahalle)L.push("📍 Mahalle: "+v.mahalle);
@@ -367,6 +422,20 @@ function waKayit(i){window.open("https://wa.me/?text="+encodeURIComponent(waMetn
 function disaAktar(){const a=tumKayitlar();if(!a.length){toast("Kayıt yok");return;}
   const b=new Blob([JSON.stringify(a,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);
   const el=document.createElement("a");el.href=u;el.download="ayaz-portfoy-"+new Date().toISOString().slice(0,10)+".json";el.click();URL.revokeObjectURL(u);toast("Yedek indirildi");}
+function csvHucre(s){s=(s==null?"":String(s)).replace(/"/g,'""');return '"'+s+'"';}
+function disaAktarCsv(){
+  const a=tumKayitlar();if(!a.length){toast("Kayıt yok");return;}
+  const basliklar=["Portföy No","Kayıt Alan","Sahibinden İlan No","Emlakjet İlan No","Kayıt Tarihi",
+    "Mahalle","Adres","Oda Sayısı","Cephe","Kat","Kat Sayısı","Bina Yaşı","Kredi Limiti","Fiyat",
+    "Mülk Sahibi","Telefon","Kiracı","Kiracı Tel","Daire","Anahtar","Salon","m²","Özellikler","Not"];
+  const satirlar=a.map(v=>[
+    v.portfoy_no,v.kayit_alan,v.sahibinden_ilan,v.emlakjet_ilan,v.kayit_tarihi,
+    v.mahalle,v.adres,v.oda_sayisi,(v.cephe||[]).join(", "),v.kat,v.kat_sayisi,v.bina_yasi,v.kredi_limiti,v.fiyat,
+    v.mulk_sahibi,v.telefon,v.kiraci,v.kiraci_tel,v.daire,v.anahtar,v.salon,v.m2,(v.ozellikler||[]).join(", "),v.not_alani
+  ].map(csvHucre).join(";"));
+  const csv="﻿"+basliklar.map(csvHucre).join(";")+"\r\n"+satirlar.join("\r\n");
+  const b=new Blob([csv],{type:"text/csv;charset=utf-8"});const u=URL.createObjectURL(b);
+  const el=document.createElement("a");el.href=u;el.download="ayaz-portfoy-"+new Date().toISOString().slice(0,10)+".csv";el.click();URL.revokeObjectURL(u);toast("Excel dosyası indirildi");}
 function iceAktar(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();
   r.onload=()=>{try{const g=JSON.parse(r.result);if(!Array.isArray(g))throw 0;const m=tumKayitlar();
     const s=new Set(m.map(x=>x.portfoy_no));let ek=0;g.forEach(x=>{if(!s.has(x.portfoy_no)){m.push(x);ek++;}});
