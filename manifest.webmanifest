@@ -1,6 +1,6 @@
 {
-  "name": "Ayaz Emlak Portföy",
-  "short_name": "Ayaz Portföy",
+  "name": "BG Gayrimenkul Portföy",
+  "short_name": "Bg Portföy",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
@@ -8,7 +8,7 @@
   "background_color": "#17171c",
   "theme_color": "#17171c",
   "icons": [
-    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+    {"src": "logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
   ]
 }
