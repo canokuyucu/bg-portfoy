@@ -268,7 +268,7 @@ const SEQ_KEY="bg_sayac", DB_KEY="bg_portfoyler";
 let aktifNo;
 let duzenleIdx=null; // null=yeni kayıt, sayı=düzenlenen kaydın index'i
 function yeniNo(){const y=new Date().getFullYear();const s=JSON.parse(localStorage.getItem(SEQ_KEY)||"{}");
-  return "AYAZ-P-"+y+"-"+String((s[y]||0)+1).padStart(4,"0");}
+  return "BG-P-"+y+"-"+String((s[y]||0)+1).padStart(4,"0");}
 function noOnayla(no){const y=no.split("-")[2],n=+no.split("-")[3];const s=JSON.parse(localStorage.getItem(SEQ_KEY)||"{}");
   s[y]=Math.max(s[y]||0,n);localStorage.setItem(SEQ_KEY,JSON.stringify(s));}
 function noGoster(){document.getElementById("pno").textContent=aktifNo; inputs.portfoy_no.value=aktifNo;}
