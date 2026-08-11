@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17171c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BG Gayrimenkul">
+<title>BG Gayrimenkul · Portföy İşaretle</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="logo.png">
+<style>
+  :root{--gold:#c8a14a;--gold-d:#a9863a;--dark:#17171c;--pen:#15307a;--danger:#c0483c}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:#2a2a30}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:40;background:var(--dark);color:#fff;
+    padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;display:flex;align-items:center;justify-content:space-between}
+  header .brand{font-weight:800;letter-spacing:.5px;font-size:16px}
+  header .brand span{color:var(--gold)}
+  header .no{font-size:11px;color:#c9c7c0;text-align:right}
+  header .no b{display:block;color:var(--gold);font-size:14px}
+  .hint{background:#3a3a42;color:#d7d5cd;font-size:12px;text-align:center;padding:7px 10px}
+  /* Form sahnesi */
+  #stage{padding:14px 8px 120px;display:flex;justify-content:center}
+  #frame{position:relative;width:100%;max-width:760px;aspect-ratio:1414/2000;
+    background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+  #frame img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none}
+  .fld{position:absolute;border:0;background:rgba(200,161,74,.10);color:var(--pen);
+    font-weight:700;padding:0 4px;line-height:1;font-family:inherit;outline:none;
+    transition:background .12s ease,box-shadow .12s ease}
+  .fld:focus{background:rgba(200,161,74,.28);box-shadow:0 0 0 2px var(--gold)}
+  textarea.fld{padding:6px;line-height:1.25;resize:none;font-weight:600}
+  .cbx{position:absolute;display:flex;align-items:center;justify-content:center;
+    color:transparent;font-weight:900;cursor:pointer;transition:background .1s ease}
+  .cbx.on{color:var(--pen)}
+  .cbx:active{background:rgba(200,161,74,.25);border-radius:6px}
+  /* Alt çubuk */
+  .bar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;
+    border-top:1px solid #e4e1d8;display:flex;gap:8px;
+    padding:10px 12px calc(env(safe-area-inset-bottom) + 10px)}
+  .btn{border:0;border-radius:12px;padding:14px 0;font-size:15px;font-weight:800;min-height:48px;
+    transition:transform .1s ease,opacity .1s ease}
+  .btn-main{flex:1;background:var(--gold);color:#26200c}
+  .btn-g{flex:0 0 26%;background:#efece4;color:#1c1c22}
+  .btn-list{flex:0 0 24%;background:var(--dark);color:#fff}
+  .btn:active{transform:scale(.96);opacity:.85}
+  .btn-theme{flex:0 0 48px;background:#efece4;color:#1c1c22;font-size:18px;padding:0}
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--dark);color:#fff;
+    padding:11px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:70;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  /* Kayıtlar paneli */
+  .modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);display:flex;align-items:flex-end}
+  .sheet{background:#f4f3ef;width:100%;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;
+    padding:16px 14px calc(env(safe-area-inset-bottom) + 16px)}
+  .sheet h3{margin:0 0 12px}
+  .search{width:100%;border:1px solid #e4e1d8;background:#fff;border-radius:10px;padding:11px 12px;
+    font-size:14px;margin-bottom:10px;font-family:inherit;outline:none}
+  .search:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(200,161,74,.25)}
+  .listbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .listbar button{flex:1;min-width:88px;border:1px solid #e4e1d8;background:#fff;border-radius:10px;padding:10px 0;font-size:12px;font-weight:700}
+  .rec{background:#fff;border:1px solid #e4e1d8;border-radius:12px;padding:12px;margin-bottom:10px}
+  .rec .pno{font-size:11px;color:var(--gold-d);font-weight:800}
+  .rec h4{margin:4px 0 2px;font-size:15px}
+  .rec .meta{font-size:12px;color:#7c7a73;margin-bottom:10px}
+  .rec .acts{display:flex;gap:6px;flex-wrap:wrap}
+  .rec .acts button{flex:1;min-width:64px;min-height:40px;border:0;border-radius:9px;padding:9px 0;
+    font-size:12px;font-weight:700;transition:transform .1s ease,opacity .1s ease}
+  .rec .acts button:active{transform:scale(.95);opacity:.85}
+  .a-open{background:var(--gold);color:#26200c}
+  .a-img{background:#efece4;color:#1c1c22}
+  .a-wa{background:#25d366;color:#fff}
+  .a-del{background:#f7e4e1;color:var(--danger);flex:0 0 42px;min-width:42px}
+  .close{width:100%;margin-top:8px;background:var(--dark);color:#fff;border:0;border-radius:12px;padding:13px;font-weight:800}
+  .empty{text-align:center;color:#7c7a73;padding:40px 10px;font-size:13px}
+
+  @media (prefers-color-scheme: dark){
+    html,body{background:#121216}
+    .hint{background:#232329;color:#a9a7a0}
+    .sheet{background:#1c1c22}
+    .sheet h3{color:#f0efe9}
+    .search{background:#26262e;border-color:#38383f;color:#f0efe9}
+    .search::placeholder{color:#7c7a86}
+    .listbar button{background:#26262e;border-color:#38383f;color:#e8e6df}
+    .rec{background:#1f1f26;border-color:#33333b}
+    .rec h4{color:#f0efe9}
+    .rec .meta{color:#9a9890}
+    .a-img{background:#33333b;color:#e8e6df}
+    .a-del{background:#3a2523;color:#e07869}
+    .empty{color:#9a9890}
+    .btn-theme{background:#33333b;color:#e8e6df}
+  }
+  :root[data-theme="dark"],
+  :root[data-theme="dark"] body{background:#121216}
+  :root[data-theme="dark"] .hint{background:#232329;color:#a9a7a0}
+  :root[data-theme="dark"] .sheet{background:#1c1c22}
+  :root[data-theme="dark"] .sheet h3{color:#f0efe9}
+  :root[data-theme="dark"] .search{background:#26262e;border-color:#38383f;color:#f0efe9}
+  :root[data-theme="dark"] .search::placeholder{color:#7c7a86}
+  :root[data-theme="dark"] .listbar button{background:#26262e;border-color:#38383f;color:#e8e6df}
+  :root[data-theme="dark"] .rec{background:#1f1f26;border-color:#33333b}
+  :root[data-theme="dark"] .rec h4{color:#f0efe9}
+  :root[data-theme="dark"] .rec .meta{color:#9a9890}
+  :root[data-theme="dark"] .a-img{background:#33333b;color:#e8e6df}
+  :root[data-theme="dark"] .btn-theme{background:#33333b;color:#e8e6df}
+  :root[data-theme="dark"] .a-del{background:#3a2523;color:#e07869}
+  :root[data-theme="dark"] .empty{color:#9a9890}
+  :root[data-theme="light"],
+  :root[data-theme="light"] body{background:#2a2a30}
+  :root[data-theme="light"] .hint{background:#3a3a42;color:#d7d5cd}
+  :root[data-theme="light"] .sheet{background:#f4f3ef}
+  :root[data-theme="light"] .sheet h3{color:#1c1c22}
+  :root[data-theme="light"] .search{background:#fff;border-color:#e4e1d8;color:#1c1c22}
+  :root[data-theme="light"] .listbar button{background:#fff;border-color:#e4e1d8;color:#1c1c22}
+  :root[data-theme="light"] .rec{background:#fff;border-color:#e4e1d8}
+  :root[data-theme="light"] .rec h4{color:#1c1c22}
+  :root[data-theme="light"] .rec .meta{color:#7c7a73}
+  :root[data-theme="light"] .a-img{background:#efece4;color:#1c1c22}
+  :root[data-theme="light"] .btn-theme{background:#efece4;color:#1c1c22}
+  :root[data-theme="light"] .a-del{background:#f7e4e1;color:var(--danger)}
+  :root[data-theme="light"] .empty{color:#7c7a73}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">BG <span>GAYRİMENKUL</span></div>
+  <div class="no">PORTFÖY NO<b id="pno">—</b></div>
+</header>
+<div class="hint">Kutucuklara dokun ✓ · çizgilere yaz · rahat basmak için parmakla yakınlaştır</div>
+
+<div id="stage">
+  <div id="frame">
+    <img id="formImg" src="form.png" alt="BG GAYRİMENKUL Portföy Formu">
+    <!-- alanlar JS ile eklenir -->
+  </div>
+</div>
+
+<div class="bar">
+  <button class="btn btn-theme" id="themeBtn" onclick="temaDegistir()" aria-label="Karanlık/Aydınlık mod">🌙</button>
+  <button class="btn btn-g" onclick="temizle(true)">Temizle</button>
+  <button class="btn btn-list" onclick="kayitlarAc()">Kayıtlar <span id="cnt"></span></button>
+  <button class="btn btn-main" id="saveBtn" onclick="kaydet()">KAYDET → Galeri</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<canvas id="cv" width="1414" height="2000" style="display:none"></canvas>
+
+<script>
+/* ---- Tema (karanlık/aydınlık, sistemden bağımsız manuel anahtar) ---- */
+const THEME_KEY="ayaz_tema";
+function temaUygula(t){
+  document.documentElement.setAttribute("data-theme",t);
+  const btn=document.getElementById("themeBtn");
+  if(btn) btn.textContent = t==="dark" ? "☀️" : "🌙";
+}
+function temaDegistir(){
+  const simdi=document.documentElement.getAttribute("data-theme");
+  const yeni = simdi==="dark" ? "light" : "dark";
+  localStorage.setItem(THEME_KEY,yeni);
+  temaUygula(yeni);
+}
+(function(){
+  const kayitli=localStorage.getItem(THEME_KEY);
+  const sistemKoyu=window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  temaUygula(kayitli || (sistemKoyu?"dark":"light"));
+})();
+
+// Form görseli GitHub kök dizindeki form.png dosyasından yüklenir.
+document.getElementById("formImg").src = "form.png";
+
+/* ---- Koordinatlar (form.png: 1414x2000 px) ---- */
+const OZELLIKLER = [
+  "İSKAN","ABONELİKLER YAPILI","KOMBİ-PETEK","MERKEZİ ISITMA","LAMİNANT PARKE",
+  "ISLAK ZEMİN-KALEBODUR","PANEL KAPI","ÇELİK KAPI","SATEN ALÇI","SATEN BOYA",
+  "KARTONPİYER","DUVAR KAĞIDI","GÖMME DOLAP","ASMA TAVAN","BANYO DOLABI","DUŞAKABİN",
+  "EBEVEYN BANYO","MERKEZİ ANTEN","KAMERA SİSTEMİ","GÖRÜNTÜLÜ DİAFON","KAPALI BALKON",
+  "FRANSIZ CAM BALKON","PENCERE DEMİRLERİ","LED IŞIKLANDIRMA","ANKASTRE MUTFAK",
+  "TV ÜNİTESİ","VESTİYER","KİLER","ASANSÖR","DIŞ CEPHE MANTO","ISI YALITIM",
+  "AHŞAP DOĞRAMA","PİMAPEN","ÖN CEPHE","OTO PARK","ALTTA DAİRE","CADDEYE YAKIN",
+  "OKULA YAKIN","İPOTEK"];
+const COLX=[85,519,974];
+const ROWY=[1136,1190,1243,1297,1351,1405,1459,1512,1566,1620,1673,1727,1782];
+const CB_SIZE=72; // dokunma/işaret kutu boyu (native px) — 60'tan büyütüldü, dokunması daha kolay
+
+// özellik kutuları -> {label,cx,cy}
+const featCB = OZELLIKLER.map((lab,i)=>({label:lab, cx:COLX[Math.floor(i/13)], cy:ROWY[i%13]}));
+const cepheCB = [
+  {label:"KUZEY",cx:233,cy:659},{label:"GÜNEY",cx:424,cy:659},
+  {label:"DOĞU",cx:233,cy:717},{label:"BATI",cx:424,cy:717}];
+
+// metin alanları: id,x,y,w,h,fs,(multiline)
+const FIELDS = [
+  {id:"kayit_alan",type:"box",x:1073,y:90,w:293,h:51,fs:28},
+  {id:"portfoy_no",type:"box",x:1073,y:164,w:293,h:50,fs:26},
+  {id:"sahibinden_ilan",type:"box",x:1073,y:246,w:293,h:50,fs:26},
+  {id:"emlakjet_ilan",type:"box",x:1073,y:315,w:293,h:50,fs:26},
+  {id:"tarih_g",type:"line",x:250,w:90,lineY:405,fs:26,ph:"gg"},
+  {id:"tarih_a",type:"line",x:352,w:90,lineY:405,fs:26,ph:"aa"},
+  {id:"tarih_y",type:"line",x:465,w:90,lineY:405,fs:26,ph:"yyyy"},
+  {id:"mahalle",type:"line",x:202,w:420,lineY:469,fs:28},
+  {id:"adres",type:"line",x:202,w:768,lineY:533,fs:28},
+  {id:"oda_sayisi",type:"line",x:202,w:177,lineY:595,fs:28},
+  {id:"kat",type:"line",x:202,w:110,lineY:791,fs:28},
+  {id:"kat_sayisi",type:"line",x:202,w:110,lineY:841,fs:28},
+  {id:"bina_yasi",type:"line",x:202,w:110,lineY:889,fs:28},
+  {id:"kredi_limiti",type:"line",x:202,w:110,lineY:935,fs:28},
+  {id:"fiyat",type:"box",x:1092,y:606,w:294,h:64,fs:34},
+  {id:"mulk_sahibi",type:"line",x:931,w:420,lineY:739,fs:26},
+  {id:"telefon",type:"line",x:931,w:420,lineY:801,fs:26},
+  {id:"kiraci",type:"line",x:931,w:420,lineY:864,fs:26},
+  {id:"kiraci_tel",type:"line",x:931,w:420,lineY:928,fs:26},
+  {id:"daire",type:"box",x:153,y:997,w:198,h:47,fs:28},
+  {id:"anahtar",type:"box",x:558,y:997,w:148,h:47,fs:28},
+  {id:"salon",type:"box",x:891,y:997,w:148,h:47,fs:28},
+  {id:"m2",type:"box",x:1237,y:997,w:149,h:47,fs:28},
+  {id:"not_alani",type:"area",x:54,y:1834,w:1333,h:119,fs:26},
+];
+const NW=1414, NH=2000;
+
+/* ---- Kurulum ---- */
+const frame=document.getElementById("frame");
+const checkState={}; // "cephe:KUZEY" / "oz:İSKAN" -> true
+
+function cbKey(g,l){return g+":"+l;}
+function ekleCheckbox(g,item){
+  const el=document.createElement("div");
+  el.className="cbx"; el.textContent="✓";
+  el.style.left=((item.cx-CB_SIZE/2)/NW*100)+"%";
+  el.style.top=((item.cy-CB_SIZE/2)/NH*100)+"%";
+  el.style.width=(CB_SIZE/NW*100)+"%";
+  el.style.height=(CB_SIZE/NH*100)+"%";
+  const key=cbKey(g,item.label);
+  el.onclick=()=>{checkState[key]=!checkState[key]; el.classList.toggle("on",!!checkState[key]);};
+  el.dataset.key=key;
+  frame.appendChild(el);
+}
+featCB.forEach(c=>ekleCheckbox("oz",c));
+cepheCB.forEach(c=>ekleCheckbox("cephe",c));
+
+const inputs={};
+FIELDS.forEach(f=>{
+  const el=document.createElement(f.type==="area"?"textarea":"input");
+  el.className="fld"; el.id="f_"+f.id; el.dataset.fs=f.fs;
+  if(f.ph) el.placeholder=f.ph;
+  let x,y,w,h;
+  if(f.type==="line"){ h=f.fs+14; y=f.lineY-h+2; x=f.x; w=f.w; }
+  else { x=f.x; y=f.y; w=f.w; h=f.h; }
+  el.style.left=(x/NW*100)+"%"; el.style.top=(y/NH*100)+"%";
+  el.style.width=(w/NW*100)+"%"; el.style.height=(h/NH*100)+"%";
+  frame.appendChild(el); inputs[f.id]=el;
+});
+
+function olcekle(){
+  const scale=frame.clientWidth/NW;
+  document.querySelectorAll(".fld").forEach(el=>{
+    el.style.fontSize=(parseFloat(el.dataset.fs)*scale)+"px";
+  });
+  document.querySelectorAll(".cbx").forEach(el=>{
+    el.style.fontSize=(CB_SIZE*scale*0.8)+"px";
+  });
+}
+new ResizeObserver(olcekle).observe(frame);
+document.getElementById("formImg").onload=olcekle;
+document.getElementById("formImg").onerror=()=>toast("form.png yüklenemedi — dosya adını kontrol et");
+
+/* ---- Portföy no ---- */
+const SEQ_KEY="bg_sayac", DB_KEY="bg_portfoyler";
+let aktifNo;
+let duzenleIdx=null; // null=yeni kayıt, sayı=düzenlenen kaydın index'i
+function yeniNo(){const y=new Date().getFullYear();const s=JSON.parse(localStorage.getItem(SEQ_KEY)||"{}");
+  return "BG-P-"+y+"-"+String((s[y]||0)+1).padStart(4,"0");}
+function noOnayla(no){const y=no.split("-")[2],n=+no.split("-")[3];const s=JSON.parse(localStorage.getItem(SEQ_KEY)||"{}");
+  s[y]=Math.max(s[y]||0,n);localStorage.setItem(SEQ_KEY,JSON.stringify(s));}
+function noGoster(){document.getElementById("pno").textContent=aktifNo; inputs.portfoy_no.value=aktifNo;}
+
+/* ---- Veri topla / yükle ---- */
+function topla(){
+  const v={portfoy_no:aktifNo, cephe:[], ozellikler:[], ts:new Date().toISOString()};
+  FIELDS.forEach(f=>v[f.id]=inputs[f.id].value.trim());
+  v.portfoy_no=inputs.portfoy_no.value.trim()||aktifNo;
+  cepheCB.forEach(c=>{if(checkState[cbKey("cephe",c.label)])v.cephe.push(c.label);});
+  featCB.forEach(c=>{if(checkState[cbKey("oz",c.label)])v.ozellikler.push(c.label);});
+  v.kayit_tarihi=[v.tarih_g,v.tarih_a,v.tarih_y].filter(Boolean).join(".");
+  return v;
+}
+function yukle(v){
+  FIELDS.forEach(f=>inputs[f.id].value=v[f.id]||"");
+  if(!v.tarih_g && v.kayit_tarihi){const p=v.kayit_tarihi.split(/[.\/\-\s]+/);
+    inputs.tarih_g.value=p[0]||""; inputs.tarih_a.value=p[1]||""; inputs.tarih_y.value=p[2]||"";}
+  Object.keys(checkState).forEach(k=>checkState[k]=false);
+  (v.cephe||[]).forEach(l=>checkState[cbKey("cephe",l)]=true);
+  (v.ozellikler||[]).forEach(l=>checkState[cbKey("oz",l)]=true);
+  document.querySelectorAll(".cbx").forEach(el=>el.classList.toggle("on",!!checkState[el.dataset.key]));
+  aktifNo=v.portfoy_no||aktifNo; noGoster();
+  document.getElementById("cv").scrollIntoView; window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ---- Canvas'a çiz (tam çözünürlük) ---- */
+function fitFont(ctx,text,maxW,fs){
+  let s=fs; ctx.font=s+'px Arial, sans-serif';
+  while(ctx.measureText(text).width>maxW && s>10){s--; ctx.font=s+'px Arial, sans-serif';}
+  return s;
+}
+function ciz(v){
+  const cv=document.getElementById("cv"), ctx=cv.getContext("2d");
+  const img=document.getElementById("formImg");
+  ctx.clearRect(0,0,NW,NH);
+  ctx.drawImage(img,0,0,NW,NH);
+  ctx.fillStyle="#15307a"; ctx.textBaseline="middle";
+  FIELDS.forEach(f=>{
+    const t=(v[f.id]||"").trim(); if(!t)return;
+    if(f.type==="area"){
+      ctx.textBaseline="top";
+      const s=f.fs; ctx.font=s+'px Arial, sans-serif';
+      const words=t.split(/\s+/); let line="", yy=f.y+4;
+      words.forEach(w=>{
+        const test=line?line+" "+w:w;
+        if(ctx.measureText(test).width>f.w-8 && line){ctx.fillText(line,f.x+4,yy); line=w; yy+=s*1.25;}
+        else line=test;
+      });
+      if(line)ctx.fillText(line,f.x+4,yy);
+    }else if(f.type==="line"){
+      const s=fitFont(ctx,t,f.w-4,f.fs);
+      ctx.font=s+'px Arial, sans-serif';
+      ctx.textBaseline="alphabetic";
+      ctx.fillText(t,f.x+2,f.lineY-7);
+    }else{ // box
+      const s=fitFont(ctx,t,f.w-6,f.fs);
+      ctx.font=s+'px Arial, sans-serif';
+      ctx.textBaseline="middle";
+      ctx.fillText(t,f.x+3,f.y+f.h/2);
+    }
+  });
+  ctx.textBaseline="alphabetic";
+  // işaretler
+  ctx.strokeStyle="#15307a"; ctx.lineWidth=6; ctx.lineCap="round"; ctx.lineJoin="round";
+  function tik(cx,cy){ctx.beginPath();ctx.moveTo(cx-13,cy+1);ctx.lineTo(cx-3,cy+13);ctx.lineTo(cx+16,cy-13);ctx.stroke();}
+  featCB.forEach(c=>{if((v.ozellikler||[]).includes(c.label))tik(c.cx,c.cy);});
+  cepheCB.forEach(c=>{if((v.cephe||[]).includes(c.label))tik(c.cx,c.cy);});
+  return cv;
+}
+function dosyaAdi(v){return (v.portfoy_no||"portfoy")+(v.mahalle?"_"+v.mahalle.replace(/\s+/g,"-"):"")+".png";}
+function galeriyeKaydet(v){
+  const cv=ciz(v);
+  const dataURL=cv.toDataURL("image/png");
+  cv.toBlob(blob=>{
+    const file=new File([blob],dosyaAdi(v),{type:"image/png"});
+    const paylasilir = !!(navigator.canShare && navigator.canShare({files:[file]}));
+    const html=`<div class="modal" onclick="if(event.target===this)this.remove()"><div class="sheet">
+      <h3>Görsel hazır — ${v.portfoy_no||""}</h3>
+      <p style="font-size:13px;color:#7c7a73;margin:0 0 10px;line-height:1.4">
+        Galeriye eklemek için görsele <b>basılı tut</b> → <b>“Görseli/Fotoğrafı kaydet”</b>.
+        ${paylasilir?"Ya da aşağıdaki butondan paylaş/kaydet.":""}
+      </p>
+      <img src="${dataURL}" style="width:100%;border:1px solid #e4e1d8;border-radius:10px;display:block" alt="Portföy görseli">
+      <button class="close" id="shBtn" style="background:var(--gold);color:#26200c;margin-top:12px">📤 Paylaş / Kaydet</button>
+      <button class="close" onclick="this.closest('.modal').remove()">Kapat</button>
+    </div></div>`;
+    document.body.insertAdjacentHTML("beforeend",html);
+    const modal=document.body.lastElementChild;
+    modal.querySelector("#shBtn").onclick=async()=>{
+      try{
+        if(paylasilir){ await navigator.share({files:[file],title:v.portfoy_no||"Portföy"}); }
+        else{
+          const url=URL.createObjectURL(blob); const a=document.createElement("a");
+          a.href=url; a.download=dosyaAdi(v); document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(()=>URL.revokeObjectURL(url),1500);
+          toast("İnmezse görsele basılı tut → kaydet");
+        }
+      }catch(e){ if(!(e&&e.name==="AbortError")) toast("İşlem iptal edildi"); }
+    };
+  },"image/png");
+}
+
+/* ---- Kaydet / temizle ---- */
+function tumKayitlar(){return JSON.parse(localStorage.getItem(DB_KEY)||"[]");}
+function dbYaz(a){localStorage.setItem(DB_KEY,JSON.stringify(a));rozet();}
+function rozet(){const n=tumKayitlar().length;document.getElementById("cnt").textContent=n?"("+n+")":"";}
+async function kaydet(){
+  const v=topla();
+  if(!v.mulk_sahibi && !v.adres && !v.telefon){toast("En az sahibi, adres veya telefon gir");return;}
+  const a=tumKayitlar();
+  const guncelleniyor = duzenleIdx!==null && a[duzenleIdx];
+  if(guncelleniyor){ a[duzenleIdx]=v; }
+  else { a.unshift(v); }
+  dbYaz(a); noOnayla(v.portfoy_no);
+  galeriyeKaydet(v);
+  toast(guncelleniyor? "✓ "+v.portfoy_no+" güncellendi" : "✓ "+v.portfoy_no+" kaydedildi");
+  temizle(false);
+}
+function bugun(){const d=new Date();return [String(d.getDate()).padStart(2,"0"),String(d.getMonth()+1).padStart(2,"0"),String(d.getFullYear())];}
+function tarihBugun(){const [g,a,y]=bugun();inputs.tarih_g.value=g;inputs.tarih_a.value=a;inputs.tarih_y.value=y;}
+function temizle(sor){
+  if(sor && !confirm("Formu temizle?"))return;
+  FIELDS.forEach(f=>{if(f.id!=="portfoy_no")inputs[f.id].value="";});
+  tarihBugun();
+  Object.keys(checkState).forEach(k=>checkState[k]=false);
+  document.querySelectorAll(".cbx.on").forEach(el=>el.classList.remove("on"));
+  aktifNo=yeniNo(); noGoster();
+  duzenleModu(null);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function duzenleModu(idx){
+  duzenleIdx=idx;
+  const btn=document.getElementById("saveBtn");
+  btn.textContent = idx!==null ? "GÜNCELLE" : "KAYDET → Galeri";
+}
+
+/* ---- Kayıtlar paneli ---- */
+function esc(s){return(s||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));}
+function kayitSatiri(v,i){
+  return `<div class="rec">
+      <div class="pno">${v.portfoy_no||""}</div>
+      <h4>${esc(v.mahalle)||"—"} ${v.oda_sayisi?("· "+esc(v.oda_sayisi)):""} ${v.fiyat?("· "+esc(v.fiyat)+" ₺"):""}</h4>
+      <div class="meta">${esc(v.mulk_sahibi)||"İsimsiz"} ${v.telefon?("· "+esc(v.telefon)):""}</div>
+      <div class="acts">
+        <button class="a-open" onclick="acKayit(${i})">Aç</button>
+        <button class="a-img" onclick="imgKayit(${i})">🖼 Görsel</button>
+        <button class="a-wa" onclick="waKayit(${i})">WhatsApp</button>
+        <button class="a-del" onclick="silKayit(${i})">🗑</button>
+      </div></div>`;
+}
+function kayitEsle(v,q){
+  if(!q)return true;
+  const hay=[v.portfoy_no,v.mahalle,v.adres,v.mulk_sahibi,v.telefon,v.kiraci,v.kiraci_tel]
+    .map(x=>(x||"").toLocaleLowerCase("tr")).join(" ");
+  return hay.includes(q);
+}
+function kayitlarRenderla(q){
+  const a=tumKayitlar();
+  const listEl=document.getElementById("recList");
+  if(!listEl)return;
+  if(!a.length){listEl.innerHTML='<div class="empty">Henüz kayıt yok.</div>';return;}
+  const eslesen=a.map((v,i)=>({v,i})).filter(({v})=>kayitEsle(v,q));
+  listEl.innerHTML = eslesen.length
+    ? eslesen.map(({v,i})=>kayitSatiri(v,i)).join("")
+    : '<div class="empty">Aramayla eşleşen kayıt yok.</div>';
+}
+function kayitlarAc(){
+  const html=`<div class="modal" onclick="if(event.target===this)this.remove()"><div class="sheet">
+    <h3>Kayıtlar</h3>
+    <input id="recSearch" class="search" type="search" placeholder="Ara: isim, adres, mahalle, telefon, portföy no…" oninput="kayitlarRenderla(this.value.trim().toLocaleLowerCase('tr'))">
+    <div class="listbar">
+      <button onclick="disaAktar()">📤 Yedek Al</button>
+      <button onclick="disaAktarCsv()">📊 Excel'e Aktar</button>
+      <button onclick="document.getElementById('imp').click()">📥 İçe Aktar</button>
+      <input id="imp" type="file" accept="application/json" style="display:none" onchange="iceAktar(event)">
+    </div>
+    <div id="recList"></div>
+    <button class="close" onclick="this.closest('.modal').remove()">Kapat</button>
+  </div></div>`;
+  document.body.insertAdjacentHTML("beforeend",html);
+  kayitlarRenderla("");
+}
+function acKayit(i){yukle(tumKayitlar()[i]);duzenleModu(i);document.querySelector(".modal")?.remove();toast("Forma yüklendi — GÜNCELLE ile üzerine yazılır");}
+function imgKayit(i){galeriyeKaydet(tumKayitlar()[i]);}
+function silKayit(i){if(!confirm("Bu kaydı sil?"))return;const a=tumKayitlar();a.splice(i,1);dbYaz(a);if(duzenleIdx!==null)duzenleModu(null);document.querySelector(".modal")?.remove();kayitlarAc();}
+function waMetni(v){
+  const L=["🏠 *BG GAYRİMENKUL — PORTFÖY*",v.portfoy_no,""];
+  if(v.mahalle)L.push("📍 Mahalle: "+v.mahalle);
+  if(v.adres)L.push("Adres: "+v.adres);
+  if(v.oda_sayisi)L.push("Oda: "+v.oda_sayisi);
+  if(v.m2)L.push("m²: "+v.m2);
+  if(v.cephe&&v.cephe.length)L.push("Cephe: "+v.cephe.join(", "));
+  if(v.fiyat)L.push("💰 Fiyat: "+v.fiyat+" ₺"); L.push("");
+  if(v.mulk_sahibi)L.push("👤 "+v.mulk_sahibi);
+  if(v.telefon)L.push("📞 "+v.telefon);
+  if(v.ozellikler&&v.ozellikler.length){L.push("");L.push("✔ "+v.ozellikler.join(", "));}
+  if(v.not_alani){L.push("");L.push("📝 "+v.not_alani);}
+  return L.join("\n");
+}
+function waKayit(i){window.open("https://wa.me/?text="+encodeURIComponent(waMetni(tumKayitlar()[i])),"_blank");}
+function disaAktar(){const a=tumKayitlar();if(!a.length){toast("Kayıt yok");return;}
+  const b=new Blob([JSON.stringify(a,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);
+  const el=document.createElement("a");el.href=u;el.download="bg-portfoy-"+new Date().toISOString().slice(0,10)+".json";el.click();URL.revokeObjectURL(u);toast("Yedek indirildi");}
+function csvHucre(s){s=(s==null?"":String(s)).replace(/"/g,'""');return '"'+s+'"';}
+function disaAktarCsv(){
+  const a=tumKayitlar();if(!a.length){toast("Kayıt yok");return;}
+  const basliklar=["Portföy No","Kayıt Alan","Sahibinden İlan No","Emlakjet İlan No","Kayıt Tarihi",
+    "Mahalle","Adres","Oda Sayısı","Cephe","Kat","Kat Sayısı","Bina Yaşı","Kredi Limiti","Fiyat",
+    "Mülk Sahibi","Telefon","Kiracı","Kiracı Tel","Daire","Anahtar","Salon","m²","Özellikler","Not"];
+  const satirlar=a.map(v=>[
+    v.portfoy_no,v.kayit_alan,v.sahibinden_ilan,v.emlakjet_ilan,v.kayit_tarihi,
+    v.mahalle,v.adres,v.oda_sayisi,(v.cephe||[]).join(", "),v.kat,v.kat_sayisi,v.bina_yasi,v.kredi_limiti,v.fiyat,
+    v.mulk_sahibi,v.telefon,v.kiraci,v.kiraci_tel,v.daire,v.anahtar,v.salon,v.m2,(v.ozellikler||[]).join(", "),v.not_alani
+  ].map(csvHucre).join(";"));
+  const csv="﻿"+basliklar.map(csvHucre).join(";")+"\r\n"+satirlar.join("\r\n");
+  const b=new Blob([csv],{type:"text/csv;charset=utf-8"});const u=URL.createObjectURL(b);
+  const el=document.createElement("a");el.href=u;el.download="bg-portfoy-"+new Date().toISOString().slice(0,10)+".csv";el.click();URL.revokeObjectURL(u);toast("Excel dosyası indirildi");}
+function iceAktar(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const g=JSON.parse(r.result);if(!Array.isArray(g))throw 0;const m=tumKayitlar();
+    const s=new Set(m.map(x=>x.portfoy_no));let ek=0;g.forEach(x=>{if(!s.has(x.portfoy_no)){m.push(x);ek++;}});
+    dbYaz(m);document.querySelector(".modal")?.remove();kayitlarAc();toast(ek+" kayıt eklendi");}catch(_){toast("Dosya okunamadı");}e.target.value="";};
+  r.readAsText(f);}
+
+let toastT;function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2200);}
+
+/* başlat */
+aktifNo=yeniNo(); noGoster();
+tarihBugun();
+rozet(); olcekle();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+</body>
+</html>
