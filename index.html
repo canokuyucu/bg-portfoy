@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#17171c">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Ayaz Portföy">
-<title>Ayaz Emlak · Portföy İşaretle</title>
+<meta name="apple-mobile-web-app-title" content="Bg Portföy">
+<title>Bg Gayrimenkul· Portföy İşaretle</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="logo.png">
 <style>
   :root{--gold:#c8a14a;--gold-d:#a9863a;--dark:#17171c;--pen:#15307a;--danger:#c0483c}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -124,14 +124,14 @@
 <body>
 
 <header>
-  <div class="brand">AYAZ <span>EMLAK</span></div>
+  <div class="brand">BG <span>GAYRİMENKUL</span></div>
   <div class="no">PORTFÖY NO<b id="pno">—</b></div>
 </header>
 <div class="hint">Kutucuklara dokun ✓ · çizgilere yaz · rahat basmak için parmakla yakınlaştır</div>
 
 <div id="stage">
   <div id="frame">
-    <img id="formImg" alt="Ayaz Emlak Portföy Formu">
+    <img id="formImg" alt="BG GAYRİMENKUL Portföy Formu">
     <!-- alanlar JS ile eklenir -->
   </div>
 </div>
@@ -264,7 +264,7 @@ new ResizeObserver(olcekle).observe(frame);
 document.getElementById("formImg").onload=olcekle;
 
 /* ---- Portföy no ---- */
-const SEQ_KEY="ayaz_sayac", DB_KEY="ayaz_portfoyler";
+const SEQ_KEY="bg_sayac", DB_KEY="bg_portfoyler";
 let aktifNo;
 let duzenleIdx=null; // null=yeni kayıt, sayı=düzenlenen kaydın index'i
 function yeniNo(){const y=new Date().getFullYear();const s=JSON.parse(localStorage.getItem(SEQ_KEY)||"{}");
